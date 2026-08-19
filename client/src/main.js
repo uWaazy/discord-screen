@@ -528,7 +528,8 @@ function openProfile() {
   $('profileId').textContent = inDiscord ? `Discord · ${session.user.id}` : 'modo local';
   $('profileInput').value = me.name;
 
-  $('profileModal').hidden = false;
+  $('profileModal').hidden = false;
+
   $('profileInput').focus();
   $('profileInput').select();
 }
@@ -1184,7 +1185,8 @@ function askPassword(room, error) {
   $('joinError').textContent = error ?? '';
   $('joinError').hidden = !error;
   if (!error) $('joinPass').value = '';
-  $('joinModal').hidden = false;
+  $('joinModal').hidden = false;
+
   $('joinPass').focus();
 }
 
@@ -1349,6 +1351,25 @@ async function authDiscord(fonteDoId) {
   const { access_token } = await post(`${P}/api/token`, { code, client_id: clientId });
   await sdk.commands.authenticate({ access_token });
 
+  // --- ADIÇÃO: Configurar o status de atividade (Rich Presence) ---
+  try {
+    await sdk.commands.setActivity({
+      activity: {
+        // Altere para "type: 1" se quiser que apareça "Transmitindo".
+        // O tipo 3 é "Assistindo" e é suportado nativamente por padrão sem precisar de links externos.
+        type: 3, 
+        state: "Transmitindo tela",
+        details: "Ao vivo na sala",
+        timestamps: {
+          start: Date.now()
+        }
+      }
+    });
+  } catch (err) {
+    console.warn("Não foi possível configurar a atividade do Discord:", err);
+  }
+  // ------------------------------------------------------------------
+
   // guild/channel vão junto para o servidor poder confirmar, pelo Discord, que
   // a pessoa está mesmo naquela call.
   return post(`${P}/api/session`, {
@@ -1358,7 +1379,6 @@ async function authDiscord(fonteDoId) {
     channel_id: sdk.channelId,
   });
 }
-
 
 /**
  * Emite uma identidade nova, jogando fora a que o servidor recusou.
@@ -1626,7 +1646,8 @@ function openModal(mode) {
     $('mFps').value = String(s.fps);
   }
 
-  $('modal').hidden = false;
+  $('modal').hidden = false;
+
 }
 
 $('liveSettings').addEventListener('click', () => openModal('live'));
@@ -1792,7 +1813,8 @@ $('newRoom').addEventListener('click', () => {
   if (!session) return;
   $('createName').value = '';
   $('createPass').value = '';
-  $('createModal').hidden = false;
+  $('createModal').hidden = false;
+
   $('createName').focus();
 });
 
@@ -1859,7 +1881,8 @@ $('roomSave').addEventListener('click', async () => {
 function openRoomSettings() {
   $('roomSub').textContent = roomInfo?.name ?? '';
   $('roomPass').value = '';
-  $('roomModal').hidden = false;
+  $('roomModal').hidden = false;
+
   $('roomPass').focus();
 }
 
